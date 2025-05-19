@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import json
+import os
 
 ADRESY = 'adresy.json'
 
@@ -13,6 +14,18 @@ class KsiazkaTelefoniczna:
         self.root.geometry('400x500')
         self.numery = []
         
+    def load_data(self):
+        if os.path.exists(ADRESY):
+            with open(ADRESY, 'r') as f:
+                try:
+                    dane = json.load(f)
+                    for el in dane:
+                        wpis = f"{el['imie']} {el['nazwisko']} | {el['telefon']}"
+                        self.numery.append(wpis)
+                        self.kontakty.insert(tk.END, wpis)
+                # Na wypadek gdy plik nie istnieje
+                except json.JSONDecodeError:
+                    pass 
     
     def build_gui(self):
         # Imie
@@ -37,6 +50,7 @@ class KsiazkaTelefoniczna:
         # Pole z numerami
         self.kontakty = tk.Listbox(self.root, width=50)
         self.kontakty.pack(pady=5)
+        self.load_data()
 
         # Przycisk usuwania 
         btn_usuwania = tk.Button(self.root, text='Usun kontakt', command=self.delete_contact)
@@ -67,7 +81,8 @@ class KsiazkaTelefoniczna:
         self.imie.delete(0, tk.END)
         self.nazwisko.delete(0, tk.END)
         self.nr_tel.delete(0, tk.END)
-    
+
+
     def run(self):
         self.build_gui()
         self.root.mainloop()
